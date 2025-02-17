@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog API</title>
+</head>
+<body>
+    <h1>Dog Image Gallery</h1>
+
+    <!-- Dropdown for dog breeds -->
+    <select id="dogs">
+        <option value="">- Select a dog breed -</option>
+    </select>
+
+    <!-- Button to trigger image fetch -->
+    <input type="button" value="Show Images" onclick="getdogimg()">
+
+    <!-- Container to display dog images -->
+    <div id="dogyy"></div>
+
+    <!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        // Fetch list of dog breeds and populate the dropdown
+        $(document).ready(function() {
+            $.ajax({
+                url: "https://dog.ceo/api/breeds/list/all",
+                type: "get",
+                success: function(data) {
+                    var breeds = data.message;
+                    var breedOptions = "";
+                    
+                    for (var breed in breeds) {
+                        // Check if the breed has sub-breeds
+                        if (breeds[breed].length > 0) {
+                            breeds[breed].forEach(function(subBreed) {
+                                breedOptions += `<option value="${breed}/${subBreed}">${subBreed} ${breed}</option>`;
+                            });
+                        } else {
+                            breedOptions += `<option value="${breed}">${breed}</option>`;
+                        }
+                    }
+
+                    // Append the options to the dropdown
+                    $('#dogs').append(breedOptions);
+                }
+            });
+        });
+
+        // Fetch and display images for the selected breed
+        function getdogimg() {
+            var breed = $('#dogs').val();
+            if (breed === "") {
+                alert("Please select a dog breed!");
+                return;
+            }
+
+            $.ajax({
+                url: "https://dog.ceo/api/breed/" + breed + "/images",
+                type: "get",
+                success: function(data) {
+                    var images = "";
+                    for (var i = 0; i < data.message.length; i++) {
+                        images += "<img src='" + data.message[i] + "' height='200px' style='margin:10px;' />";
+                    }
+                    $('#dogyy').html(images);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
